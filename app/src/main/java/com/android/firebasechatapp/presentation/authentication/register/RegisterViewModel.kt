@@ -2,7 +2,7 @@ package com.android.firebasechatapp.presentation.authentication.register
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.android.firebasechatapp.domain.use_case.RegisterUseCase
+import com.android.firebasechatapp.domain.use_case.authentication.RegisterUseCase
 import com.android.firebasechatapp.resource.Resource
 import com.google.firebase.auth.AuthResult
 import dagger.hilt.android.lifecycle.HiltViewModel

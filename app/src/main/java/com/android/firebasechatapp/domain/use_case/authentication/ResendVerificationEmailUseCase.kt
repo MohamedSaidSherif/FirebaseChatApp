@@ -1,4 +1,4 @@
-package com.android.firebasechatapp.domain.use_case
+package com.android.firebasechatapp.domain.use_case.authentication
 
 import com.android.firebasechatapp.domain.repository.authentication.AuthenticationRepository
 import com.android.firebasechatapp.resource.Resource

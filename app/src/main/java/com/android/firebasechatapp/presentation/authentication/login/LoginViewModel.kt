@@ -2,8 +2,8 @@ package com.android.firebasechatapp.presentation.authentication.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.android.firebasechatapp.domain.use_case.LoginUseCase
-import com.android.firebasechatapp.domain.use_case.ResendVerificationEmailUseCase
+import com.android.firebasechatapp.domain.use_case.authentication.LoginUseCase
+import com.android.firebasechatapp.domain.use_case.authentication.ResendVerificationEmailUseCase
 import com.android.firebasechatapp.resource.Resource
 import com.google.firebase.auth.AuthResult
 import dagger.hilt.android.lifecycle.HiltViewModel

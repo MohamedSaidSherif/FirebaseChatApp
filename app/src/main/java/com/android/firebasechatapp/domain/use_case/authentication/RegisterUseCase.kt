@@ -1,4 +1,4 @@
-package com.android.firebasechatapp.domain.use_case
+package com.android.firebasechatapp.domain.use_case.authentication
 
 import com.android.firebasechatapp.domain.repository.authentication.AuthenticationRepository
 import com.android.firebasechatapp.resource.Resource
@@ -14,7 +14,8 @@ class RegisterUseCase @Inject constructor(
         password: String,
         confirmPassword: String
     ): Resource<AuthResult> {
-        val validationResult = AuthenticationValidation.validateRegistrationForm(email, password, confirmPassword)
+        val validationResult =
+            AuthenticationValidation.validateRegistrationForm(email, password, confirmPassword)
         if (validationResult is Resource.Error) {
             return validationResult
         }
