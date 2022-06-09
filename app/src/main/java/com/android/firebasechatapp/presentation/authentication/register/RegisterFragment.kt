@@ -21,10 +21,6 @@ class RegisterFragment : Fragment() {
     private lateinit var binding: FragmentRegisterBinding
     private val viewModel: RegisterViewModel by viewModels()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
