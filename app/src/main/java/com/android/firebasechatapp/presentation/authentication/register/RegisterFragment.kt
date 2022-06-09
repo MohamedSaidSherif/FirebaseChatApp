@@ -1,14 +1,13 @@
-package com.android.firebasechatapp.presentation.login
+package com.android.firebasechatapp.presentation.authentication.register
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.android.firebasechatapp.databinding.FragmentLoginBinding
+import com.android.firebasechatapp.databinding.FragmentRegisterBinding
 import com.android.firebasechatapp.presentation.collectLatestLifecycleFlow
 import com.android.firebasechatapp.presentation.hideKeyboard
 import com.android.firebasechatapp.presentation.showToast
@@ -17,10 +16,10 @@ import com.android.firebasechatapp.resource.asString
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class LoginFragment : Fragment() {
+class RegisterFragment : Fragment() {
 
-    private lateinit var binding: FragmentLoginBinding
-    private val viewModel: LoginViewModel by viewModels()
+    private lateinit var binding: FragmentRegisterBinding
+    private val viewModel: RegisterViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,7 +29,7 @@ class LoginFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentLoginBinding.inflate(layoutInflater, container, false)
+        binding = FragmentRegisterBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
 
@@ -41,25 +40,23 @@ class LoginFragment : Fragment() {
     }
 
     private fun setUpListenerForViews() {
-        binding.emailSignInButton.setOnClickListener {
+        binding.btnRegister.setOnClickListener {
             it.hideKeyboard()
-            viewModel.login(
-                email = binding.email.text.toString(),
-                password = binding.password.text.toString()
+            viewModel.register(
+                email = binding.inputEmail.text.toString(),
+                password = binding.inputPassword.text.toString(),
+                confirmPassword = binding.inputConfirmPassword.text.toString()
             )
-        }
-
-        binding.register.setOnClickListener {
-            findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToRegisterFragment())
         }
     }
 
     private fun observeRegisterState() {
-        collectLatestLifecycleFlow(viewModel.loginResultStatus) { result ->
+        collectLatestLifecycleFlow(viewModel.registerResultStatus) { result ->
             when (result) {
                 is Resource.Success -> {
                     binding.progressBar.visibility = View.GONE
-                    showToast("User is logged in successfully")
+                    showToast("User is registered successfully.\nPlease check you inbox to verify your email")
+                    findNavController().navigateUp()
                 }
                 is Resource.Error -> {
                     binding.progressBar.visibility = View.GONE
@@ -73,6 +70,6 @@ class LoginFragment : Fragment() {
     }
 
     companion object {
-        private val TAG = LoginFragment::class.simpleName.toString()
+        private val TAG = RegisterFragment::class.simpleName.toString()
     }
 }

@@ -50,6 +50,26 @@ class AuthenticationRepositoryImp @Inject constructor(
         }
     }
 
+    override suspend fun resendVerificationEmail(
+        email: String,
+        password: String
+    ): Resource<Unit> {
+        return withContext(coroutineDispatcher) {
+            safeCall {
+                val loginResult = firebaseAuth.signInWithEmailAndPassword(email, password).await()
+                firebaseAuth.signOut()
+                loginResult.user?.let {
+                    it.sendEmailVerification().await()
+                    Resource.Success(Unit)
+                } ?: kotlin.run {
+                    Resource.Error(
+                        uiText = UiText.DynamicString("Unable to send verification code. please try again")
+                    )
+                }
+            }
+        }
+    }
+
     companion object {
         private val TAG = AuthenticationRepositoryImp::class.simpleName.toString()
     }

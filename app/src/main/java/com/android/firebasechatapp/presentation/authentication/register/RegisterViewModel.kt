@@ -1,4 +1,4 @@
-package com.android.firebasechatapp.presentation.register
+package com.android.firebasechatapp.presentation.authentication.register
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
