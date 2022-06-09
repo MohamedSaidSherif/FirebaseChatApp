@@ -16,6 +16,9 @@ class AuthenticationRepositoryImp @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
     private val coroutineDispatcher: CoroutineDispatcher
 ) : AuthenticationRepository {
+
+    override suspend fun isUserSignedIn(): Boolean = firebaseAuth.currentUser != null
+
     override suspend fun login(email: String, password: String): Resource<AuthResult> {
         return withContext(coroutineDispatcher) {
             safeCall {

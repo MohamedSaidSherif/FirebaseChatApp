@@ -59,7 +59,7 @@ class LoginFragment : Fragment() {
             when (result) {
                 is Resource.Success -> {
                     binding.progressBar.visibility = View.GONE
-                    showToast("User is logged in successfully")
+                    findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToMainFragment())
                 }
                 is Resource.Error -> {
                     binding.progressBar.visibility = View.GONE
