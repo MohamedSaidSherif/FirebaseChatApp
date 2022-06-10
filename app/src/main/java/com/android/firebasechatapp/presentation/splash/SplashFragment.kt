@@ -52,7 +52,7 @@ class SplashFragment : Fragment() {
         collectLatestLifecycleFlow(viewModel.isUserSignedInState) { result ->
             result?.let {
                 if (it) {
-                    findNavController().navigate(SplashFragmentDirections.actionSplashFragmentToMainFragment())
+                    findNavController().navigate(SplashFragmentDirections.actionSplashFragmentToHomeFragment())
                 } else {
                     findNavController().navigate(SplashFragmentDirections.actionSplashFragmentToLoginFragment())
                 }

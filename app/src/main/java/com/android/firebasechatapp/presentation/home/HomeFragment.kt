@@ -49,6 +49,7 @@ class HomeFragment : Fragment() {
                 true
             }
             R.id.optionAccountSettings -> {
+                findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToAccountSettingsFragment())
                 return true
             }
             R.id.optionAdmin -> {
@@ -75,7 +76,7 @@ class HomeFragment : Fragment() {
             progressBar.isVisible = state.progressBarVisible
         }
         if (state.isSignedOut) {
-            findNavController().navigate(HomeFragmentDirections.actionMainFragmentToLoginFragment())
+            findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToLoginFragment())
         } else if(state.errorUiText != null) {
             showToast("Failed to sign out. please try again")
         }

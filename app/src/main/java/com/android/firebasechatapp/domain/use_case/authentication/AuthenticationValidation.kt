@@ -6,7 +6,7 @@ import com.android.firebasechatapp.resource.UiText
 
 object AuthenticationValidation {
 
-    private const val MINIMUM_PASSWORD_LENGTH = 6
+    const val MINIMUM_PASSWORD_LENGTH = 6
 
     fun validateLoginForm(email: String, password: String): Resource<Unit> {
         if (email.isEmpty()) {

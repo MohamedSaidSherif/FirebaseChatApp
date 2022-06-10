@@ -60,11 +60,12 @@ class AuthenticationRepositoryImp @Inject constructor(
         return withContext(coroutineDispatcher) {
             safeCall {
                 val loginResult = firebaseAuth.signInWithEmailAndPassword(email, password).await()
-                firebaseAuth.signOut()
                 loginResult.user?.let {
                     it.sendEmailVerification().await()
+                    firebaseAuth.signOut()
                     Resource.Success(Unit)
                 } ?: kotlin.run {
+                    firebaseAuth.signOut()
                     Resource.Error(
                         uiText = UiText.DynamicString("Unable to send verification code. please try again")
                     )
@@ -86,6 +87,7 @@ class AuthenticationRepositoryImp @Inject constructor(
         return withContext(coroutineDispatcher) {
             safeCall {
                 firebaseAuth.sendPasswordResetEmail(email).await()
+                firebaseAuth.signOut()
                 Resource.Success(Unit)
             }
         }

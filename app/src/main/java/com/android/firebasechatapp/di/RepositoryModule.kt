@@ -1,6 +1,8 @@
 package com.android.firebasechatapp.di
 
+import com.android.firebasechatapp.data.repository.AccountSettingRepositoryImp
 import com.android.firebasechatapp.data.repository.AuthenticationRepositoryImp
+import com.android.firebasechatapp.domain.repository.authentication.AccountSettingRepository
 import com.android.firebasechatapp.domain.repository.authentication.AuthenticationRepository
 import com.google.firebase.auth.FirebaseAuth
 import dagger.Module
@@ -26,6 +28,18 @@ object RepositoryModule {
         coroutineDispatcher: CoroutineDispatcher
     ): AuthenticationRepository {
         return AuthenticationRepositoryImp(
+            firebaseAuth = firebaseAuth,
+            coroutineDispatcher = coroutineDispatcher
+        )
+    }
+
+    @Singleton
+    @Provides
+    fun provideAccountSettingRepository(
+        firebaseAuth: FirebaseAuth,
+        coroutineDispatcher: CoroutineDispatcher
+    ): AccountSettingRepository {
+        return AccountSettingRepositoryImp(
             firebaseAuth = firebaseAuth,
             coroutineDispatcher = coroutineDispatcher
         )
