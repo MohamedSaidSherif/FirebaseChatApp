@@ -10,4 +10,5 @@ interface AuthenticationRepository {
     suspend fun register(email: String, password: String): Resource<AuthResult>
     suspend fun resendVerificationEmail(email: String, password: String): SimpleResource
     suspend fun signOut(): SimpleResource
+    suspend fun sendPasswordResetEmail(email: String): SimpleResource
 }

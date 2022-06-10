@@ -48,6 +48,11 @@ class LoginFragment : Fragment() {
             findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToRegisterFragment())
         }
 
+        binding.forgotPassword.setOnClickListener {
+            val passwordResetDialog = PasswordResetDialog()
+            passwordResetDialog.show(childFragmentManager, "PasswordResetDialog")
+        }
+
         binding.resendVerificationEmail.setOnClickListener {
             val resendVerificationDialog = ResendVerificationDialog()
             resendVerificationDialog.show(childFragmentManager, "ResendVerificationDialog")

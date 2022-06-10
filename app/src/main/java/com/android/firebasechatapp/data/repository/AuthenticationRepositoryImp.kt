@@ -82,6 +82,15 @@ class AuthenticationRepositoryImp @Inject constructor(
         }
     }
 
+    override suspend fun sendPasswordResetEmail(email: String): SimpleResource {
+        return withContext(coroutineDispatcher) {
+            safeCall {
+                firebaseAuth.sendPasswordResetEmail(email).await()
+                Resource.Success(Unit)
+            }
+        }
+    }
+
     companion object {
         private val TAG = AuthenticationRepositoryImp::class.simpleName.toString()
     }
