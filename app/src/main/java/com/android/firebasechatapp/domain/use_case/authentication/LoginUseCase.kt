@@ -8,7 +8,6 @@ import javax.inject.Inject
 class LoginUseCase @Inject constructor(
     private val authenticationRepository: AuthenticationRepository
 ) {
-
     suspend operator fun invoke(email: String, password: String): Resource<AuthResult> {
         val validationResult = AuthenticationValidation.validateLoginForm(email, password)
         if (validationResult is Resource.Error) {

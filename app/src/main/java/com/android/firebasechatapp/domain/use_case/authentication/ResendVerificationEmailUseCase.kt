@@ -8,7 +8,6 @@ import javax.inject.Inject
 class ResendVerificationEmailUseCase @Inject constructor(
     private val authenticationRepository: AuthenticationRepository
 ) {
-
     suspend operator fun invoke(email: String, password: String): SimpleResource {
         val validationResult = AuthenticationValidation.validateLoginForm(email, password)
         if (validationResult is Resource.Error) {

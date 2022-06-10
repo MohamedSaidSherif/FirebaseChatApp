@@ -1,8 +1,8 @@
 package com.android.firebasechatapp.data.repository
 
-import android.util.Log
 import com.android.firebasechatapp.domain.repository.authentication.AuthenticationRepository
 import com.android.firebasechatapp.resource.Resource
+import com.android.firebasechatapp.resource.SimpleResource
 import com.android.firebasechatapp.resource.UiText
 import com.android.firebasechatapp.resource.safeCall
 import com.google.firebase.auth.AuthResult
@@ -69,6 +69,15 @@ class AuthenticationRepositoryImp @Inject constructor(
                         uiText = UiText.DynamicString("Unable to send verification code. please try again")
                     )
                 }
+            }
+        }
+    }
+
+    override suspend fun signOut(): SimpleResource {
+        return withContext(coroutineDispatcher) {
+            safeCall {
+                firebaseAuth.signOut()
+                Resource.Success(Unit)
             }
         }
     }
