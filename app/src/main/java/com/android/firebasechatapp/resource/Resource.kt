@@ -18,6 +18,7 @@ inline fun <T> safeCall(action: () -> Resource<T>): Resource<T> {
     return try {
         action()
     } catch (e: Exception) {
+        e.printStackTrace()
         val uiText = e.message?.let { UiText.DynamicString(it) } ?: UiText.unknownError()
         Resource.Error(uiText)
     }

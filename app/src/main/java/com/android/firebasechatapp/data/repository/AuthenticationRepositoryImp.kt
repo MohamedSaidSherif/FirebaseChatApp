@@ -2,7 +2,7 @@ package com.android.firebasechatapp.data.repository
 
 import android.content.Context
 import com.android.firebasechatapp.R
-import com.android.firebasechatapp.domain.model.User
+import com.android.firebasechatapp.data.model.RemoteUser
 import com.android.firebasechatapp.domain.model.authentication.AuthenticationState
 import com.android.firebasechatapp.domain.repository.authentication.AuthenticationRepository
 import com.android.firebasechatapp.resource.Resource
@@ -51,7 +51,7 @@ class AuthenticationRepositoryImp @Inject constructor(
                     firebaseAuth.createUserWithEmailAndPassword(email, password).await()
                 registrationResult.user?.let { firebaseUser ->
                     firebaseUser.sendEmailVerification().await()
-                    val user = User(
+                    val remoteUser = RemoteUser(
                         name = email.substring(0, email.indexOf("@")),
                         phone = "",
                         profileImage = "",
@@ -61,7 +61,7 @@ class AuthenticationRepositoryImp @Inject constructor(
                     databaseReference
                         .child(context.getString(R.string.dbnode_users))
                         .child(firebaseUser.uid)
-                        .setValue(user).await()
+                        .setValue(remoteUser).await()
                     firebaseAuth.signOut()
                     Resource.Success(registrationResult)
                 } ?: kotlin.run {

@@ -64,6 +64,11 @@ class AccountSettingsFragment : Fragment() {
     private fun updateUI(state: AccountSettingsState) {
         with(binding) {
             progressBar.isVisible = state.isProgressBarVisible
+            state.user?.let {
+                inputName.setText(it.name)
+                inputPhone.setText(it.phone)
+                inputEmail.setText(it.email)
+            }
         }
         if (state.isProfileDataUpdated) {
             showToast("Profile data is updated successfully.")

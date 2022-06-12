@@ -2,6 +2,11 @@ package com.android.firebasechatapp.data.repository
 
 import android.content.Context
 import com.android.firebasechatapp.R
+import com.android.firebasechatapp.data.firebase_extension.DataResponse
+import com.android.firebasechatapp.data.firebase_extension.singleValueEvent
+import com.android.firebasechatapp.data.model.RemoteUser
+import com.android.firebasechatapp.data.model.toUser
+import com.android.firebasechatapp.domain.model.User
 import com.android.firebasechatapp.domain.model.account_settings.ProfileUpdateResult
 import com.android.firebasechatapp.domain.repository.authentication.AccountSettingRepository
 import com.android.firebasechatapp.resource.Resource
@@ -22,6 +27,50 @@ class AccountSettingRepositoryImp @Inject constructor(
     private val context: Context
 ) : AccountSettingRepository {
 
+    override suspend fun getUser(): Resource<User> {
+        return withContext(coroutineDispatcher) {
+            safeCall {
+                firebaseAuth.currentUser?.let { firebaseUser ->
+                    firebaseUser.email?.let { email ->
+                        val result =
+                            databaseReference.child(context.getString(R.string.dbnode_users))
+                                .orderByKey()
+                                .equalTo(firebaseUser.uid)
+                                .singleValueEvent()
+                        when (result) {
+                            is DataResponse.Complete -> {
+                                result.data.children.forEach {
+                                    val remoteUser = it.getValue(RemoteUser::class.java)
+                                    remoteUser?.let { remoteUser ->
+                                        return@safeCall Resource.Success(remoteUser.toUser(email))
+                                    }
+                                }
+                                Resource.Error(
+                                    uiText = UiText.DynamicString("Failed to get user info")
+                                )
+                            }
+                            is DataResponse.Error -> {
+                                result.error.printStackTrace()
+                                return@safeCall Resource.Error(
+                                    uiText = result.error.message?.let { UiText.DynamicString(it) }
+                                        ?: UiText.unknownError()
+                                )
+                            }
+                        }
+                    } ?: kotlin.run {
+                        //This case NEVER should happen
+                        //and if it's happened, we should logout the user the redirect to login screen
+                        Resource.Error(uiText = UiText.DynamicString("User Not Authenticated. Failed to get current email"))
+                    }
+                } ?: kotlin.run {
+                    //This case NEVER should happen
+                    //and if it's happened, we should logout the user the redirect to login screen
+                    Resource.Error(uiText = UiText.DynamicString("User Not Authenticated. Failed to get current user"))
+                }
+            }
+        }
+    }
+
     override suspend fun updateProfileData(
         name: String,
         phone: String,
@@ -32,6 +81,9 @@ class AccountSettingRepositoryImp @Inject constructor(
             safeCall {
                 firebaseAuth.currentUser?.let { firebaseUser ->
                     firebaseUser.email?.let { currentEmail ->
+                        val emailAuthProvider =
+                            EmailAuthProvider.getCredential(currentEmail, password)
+                        firebaseUser.reauthenticate(emailAuthProvider).await()
                         databaseReference.child(context.getString(R.string.dbnode_users))
                             .child(firebaseUser.uid)
                             .child(context.getString(R.string.field_name))
@@ -42,9 +94,6 @@ class AccountSettingRepositoryImp @Inject constructor(
                             .setValue(phone)
 
                         if (email != currentEmail) {
-                            val emailAuthProvider =
-                                EmailAuthProvider.getCredential(currentEmail, password)
-                            firebaseUser.reauthenticate(emailAuthProvider).await()
                             firebaseUser.updateEmail(email).await()
                             firebaseUser.sendEmailVerification()
                             firebaseAuth.signOut()
