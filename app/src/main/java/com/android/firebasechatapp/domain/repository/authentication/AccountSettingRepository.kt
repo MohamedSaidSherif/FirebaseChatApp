@@ -1,6 +1,7 @@
 package com.android.firebasechatapp.domain.repository.authentication
 
-import com.android.firebasechatapp.resource.SimpleResource
+import com.android.firebasechatapp.domain.model.account_settings.ProfileUpdateResult
+import com.android.firebasechatapp.resource.Resource
 
 interface AccountSettingRepository {
     suspend fun updateProfileData(
@@ -8,5 +9,5 @@ interface AccountSettingRepository {
         phone: String,
         email: String,
         password: String
-    ): SimpleResource
+    ): Resource<ProfileUpdateResult>
 }

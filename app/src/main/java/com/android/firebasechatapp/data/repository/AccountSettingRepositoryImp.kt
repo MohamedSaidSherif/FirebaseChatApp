@@ -2,9 +2,9 @@ package com.android.firebasechatapp.data.repository
 
 import android.content.Context
 import com.android.firebasechatapp.R
+import com.android.firebasechatapp.domain.model.account_settings.ProfileUpdateResult
 import com.android.firebasechatapp.domain.repository.authentication.AccountSettingRepository
 import com.android.firebasechatapp.resource.Resource
-import com.android.firebasechatapp.resource.SimpleResource
 import com.android.firebasechatapp.resource.UiText
 import com.android.firebasechatapp.resource.safeCall
 import com.google.firebase.auth.EmailAuthProvider
@@ -27,7 +27,7 @@ class AccountSettingRepositoryImp @Inject constructor(
         phone: String,
         email: String,
         password: String
-    ): SimpleResource {
+    ): Resource<ProfileUpdateResult> {
         return withContext(coroutineDispatcher) {
             safeCall {
                 firebaseAuth.currentUser?.let { firebaseUser ->
@@ -49,7 +49,11 @@ class AccountSettingRepositoryImp @Inject constructor(
                             firebaseUser.sendEmailVerification()
                             firebaseAuth.signOut()
                         }
-                        Resource.Success(Unit)
+                        Resource.Success(
+                            ProfileUpdateResult(
+                                isEmailUpdated = email != currentEmail
+                            )
+                        )
                     } ?: kotlin.run {
                         //This case NEVER should happen
                         //and if it's happened, we should logout the user the redirect to login screen

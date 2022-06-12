@@ -1,8 +1,8 @@
 package com.android.firebasechatapp.domain.use_case.account_settings
 
+import com.android.firebasechatapp.domain.model.account_settings.ProfileUpdateResult
 import com.android.firebasechatapp.domain.repository.authentication.AccountSettingRepository
 import com.android.firebasechatapp.resource.Resource
-import com.android.firebasechatapp.resource.SimpleResource
 import javax.inject.Inject
 
 class UpdateProfileDataUseCase @Inject constructor(
@@ -13,7 +13,7 @@ class UpdateProfileDataUseCase @Inject constructor(
         phone: String,
         email: String,
         password: String
-    ): SimpleResource {
+    ): Resource<ProfileUpdateResult> {
         val validationResult = UpdateProfileDataValidation.validateProfileData(
             name = name,
             email = email,

@@ -3,6 +3,7 @@ package com.android.firebasechatapp.data.repository
 import android.content.Context
 import com.android.firebasechatapp.R
 import com.android.firebasechatapp.domain.model.User
+import com.android.firebasechatapp.domain.model.authentication.AuthenticationState
 import com.android.firebasechatapp.domain.repository.authentication.AuthenticationRepository
 import com.android.firebasechatapp.resource.Resource
 import com.android.firebasechatapp.resource.SimpleResource
@@ -12,6 +13,8 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -108,6 +111,22 @@ class AuthenticationRepositoryImp @Inject constructor(
                 Resource.Success(Unit)
             }
         }
+    }
+
+    override suspend fun observeAuthState() = callbackFlow {
+        val authStateListener = FirebaseAuth.AuthStateListener { fAuth ->
+            fAuth.currentUser?.let {
+                if (it.isEmailVerified) {
+                    trySend(AuthenticationState.SignedIn)
+                } else {
+                    trySend(AuthenticationState.NotVerified)
+                }
+            } ?: kotlin.run {
+                trySend(AuthenticationState.SignedOut)
+            }
+        }
+        firebaseAuth.addAuthStateListener(authStateListener)
+        awaitClose { firebaseAuth.removeAuthStateListener(authStateListener) }
     }
 
     companion object {

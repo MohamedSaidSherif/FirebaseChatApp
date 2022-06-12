@@ -56,6 +56,7 @@ class AccountSettingsViewModel @Inject constructor(
                     _accountSettingsState.emit(
                         accountSettingsState.value.copy(
                             isProfileDataUpdated = true,
+                            isEmailUpdated = result.data.isEmailUpdated,
                             isPasswordResetEmailSent = false,
                             isProgressBarVisible = false,
                             errorUiText = null
