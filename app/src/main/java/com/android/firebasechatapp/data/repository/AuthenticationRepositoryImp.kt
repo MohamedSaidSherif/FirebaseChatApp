@@ -1,5 +1,8 @@
 package com.android.firebasechatapp.data.repository
 
+import android.content.Context
+import com.android.firebasechatapp.R
+import com.android.firebasechatapp.domain.model.User
 import com.android.firebasechatapp.domain.repository.authentication.AuthenticationRepository
 import com.android.firebasechatapp.resource.Resource
 import com.android.firebasechatapp.resource.SimpleResource
@@ -7,6 +10,7 @@ import com.android.firebasechatapp.resource.UiText
 import com.android.firebasechatapp.resource.safeCall
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -14,7 +18,9 @@ import javax.inject.Inject
 
 class AuthenticationRepositoryImp @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
-    private val coroutineDispatcher: CoroutineDispatcher
+    private val databaseReference: DatabaseReference,
+    private val coroutineDispatcher: CoroutineDispatcher,
+    private val context: Context
 ) : AuthenticationRepository {
 
     override suspend fun isUserSignedIn(): Boolean = firebaseAuth.currentUser != null
@@ -40,8 +46,19 @@ class AuthenticationRepositoryImp @Inject constructor(
             safeCall {
                 val registrationResult: AuthResult =
                     firebaseAuth.createUserWithEmailAndPassword(email, password).await()
-                registrationResult.user?.let {
-                    it.sendEmailVerification().await()
+                registrationResult.user?.let { firebaseUser ->
+                    firebaseUser.sendEmailVerification().await()
+                    val user = User(
+                        name = email.substring(0, email.indexOf("@")),
+                        phone = "",
+                        profileImage = "",
+                        securityLevel = "1",
+                        userId = firebaseUser.uid
+                    )
+                    databaseReference
+                        .child(context.getString(R.string.dbnode_users))
+                        .child(firebaseUser.uid)
+                        .setValue(user).await()
                     firebaseAuth.signOut()
                     Resource.Success(registrationResult)
                 } ?: kotlin.run {

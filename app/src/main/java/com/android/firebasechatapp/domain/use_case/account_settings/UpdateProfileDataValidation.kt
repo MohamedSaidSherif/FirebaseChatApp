@@ -9,10 +9,13 @@ import com.android.firebasechatapp.resource.UiText
 object UpdateProfileDataValidation {
 
     fun validateProfileData(
+        name: String,
         email: String,
         password: String
     ): SimpleResource {
-        if (email.isEmpty()) {
+        if (name.isEmpty()) {
+            return Resource.Error(UiText.DynamicString("Name is empty"))
+        } else if (email.isEmpty()) {
             return Resource.Error(UiText.DynamicString("Email is empty"))
         } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             return Resource.Error(UiText.DynamicString("Email not valid"))

@@ -38,15 +38,20 @@ class AccountSettingsViewModel @Inject constructor(
 
     private fun updateProfileData(event: AccountSettingsEvent.SaveAction) {
         viewModelScope.launch {
-                _accountSettingsState.emit(
-                    accountSettingsState.value.copy(
-                        isProfileDataUpdated = false,
-                        isPasswordResetEmailSent = false,
-                        isProgressBarVisible = true,
-                        errorUiText = null
-                    )
+            _accountSettingsState.emit(
+                accountSettingsState.value.copy(
+                    isProfileDataUpdated = false,
+                    isPasswordResetEmailSent = false,
+                    isProgressBarVisible = true,
+                    errorUiText = null
                 )
-            when (val result = updateProfileDataUseCase(event.email, event.confirmedPassword)) {
+            )
+            when (val result = updateProfileDataUseCase(
+                name = event.name,
+                phone = event.phone,
+                email = event.email,
+                password = event.confirmedPassword
+            )) {
                 is Resource.Success -> {
                     _accountSettingsState.emit(
                         accountSettingsState.value.copy(

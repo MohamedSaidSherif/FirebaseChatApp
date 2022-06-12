@@ -1,5 +1,7 @@
 package com.android.firebasechatapp.data.repository
 
+import android.content.Context
+import com.android.firebasechatapp.R
 import com.android.firebasechatapp.domain.repository.authentication.AccountSettingRepository
 import com.android.firebasechatapp.resource.Resource
 import com.android.firebasechatapp.resource.SimpleResource
@@ -7,6 +9,7 @@ import com.android.firebasechatapp.resource.UiText
 import com.android.firebasechatapp.resource.safeCall
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -14,23 +17,38 @@ import javax.inject.Inject
 
 class AccountSettingRepositoryImp @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
-    private val coroutineDispatcher: CoroutineDispatcher
+    private val databaseReference: DatabaseReference,
+    private val coroutineDispatcher: CoroutineDispatcher,
+    private val context: Context
 ) : AccountSettingRepository {
 
-    override suspend fun updateEmail(email: String, password: String): SimpleResource {
+    override suspend fun updateProfileData(
+        name: String,
+        phone: String,
+        email: String,
+        password: String
+    ): SimpleResource {
         return withContext(coroutineDispatcher) {
             safeCall {
                 firebaseAuth.currentUser?.let { firebaseUser ->
                     firebaseUser.email?.let { currentEmail ->
-                        if (email == currentEmail) {
-                            return@safeCall Resource.Error(uiText = UiText.DynamicString("Current email is the same as new one"))
+                        databaseReference.child(context.getString(R.string.dbnode_users))
+                            .child(firebaseUser.uid)
+                            .child(context.getString(R.string.field_name))
+                            .setValue(name)
+                        databaseReference.child(context.getString(R.string.dbnode_users))
+                            .child(firebaseUser.uid)
+                            .child(context.getString(R.string.field_phone))
+                            .setValue(phone)
+
+                        if (email != currentEmail) {
+                            val emailAuthProvider =
+                                EmailAuthProvider.getCredential(currentEmail, password)
+                            firebaseUser.reauthenticate(emailAuthProvider).await()
+                            firebaseUser.updateEmail(email).await()
+                            firebaseUser.sendEmailVerification()
+                            firebaseAuth.signOut()
                         }
-                        val emailAuthProvider =
-                            EmailAuthProvider.getCredential(currentEmail, password)
-                        firebaseUser.reauthenticate(emailAuthProvider).await()
-                        firebaseUser.updateEmail(email).await()
-                        firebaseUser.sendEmailVerification()
-                        firebaseAuth.signOut()
                         Resource.Success(Unit)
                     } ?: kotlin.run {
                         //This case NEVER should happen

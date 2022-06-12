@@ -1,13 +1,16 @@
 package com.android.firebasechatapp.di
 
+import android.content.Context
 import com.android.firebasechatapp.data.repository.AccountSettingRepositoryImp
 import com.android.firebasechatapp.data.repository.AuthenticationRepositoryImp
 import com.android.firebasechatapp.domain.repository.authentication.AccountSettingRepository
 import com.android.firebasechatapp.domain.repository.authentication.AuthenticationRepository
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -25,11 +28,15 @@ object RepositoryModule {
     @Provides
     fun provideAuthenticationRepository(
         firebaseAuth: FirebaseAuth,
-        coroutineDispatcher: CoroutineDispatcher
+        databaseReference: DatabaseReference,
+        coroutineDispatcher: CoroutineDispatcher,
+        @ApplicationContext context: Context
     ): AuthenticationRepository {
         return AuthenticationRepositoryImp(
             firebaseAuth = firebaseAuth,
-            coroutineDispatcher = coroutineDispatcher
+            databaseReference = databaseReference,
+            coroutineDispatcher = coroutineDispatcher,
+            context = context
         )
     }
 
@@ -37,11 +44,15 @@ object RepositoryModule {
     @Provides
     fun provideAccountSettingRepository(
         firebaseAuth: FirebaseAuth,
-        coroutineDispatcher: CoroutineDispatcher
+        databaseReference: DatabaseReference,
+        coroutineDispatcher: CoroutineDispatcher,
+        @ApplicationContext context: Context
     ): AccountSettingRepository {
         return AccountSettingRepositoryImp(
             firebaseAuth = firebaseAuth,
-            coroutineDispatcher = coroutineDispatcher
+            databaseReference = databaseReference,
+            coroutineDispatcher = coroutineDispatcher,
+            context = context
         )
     }
 }

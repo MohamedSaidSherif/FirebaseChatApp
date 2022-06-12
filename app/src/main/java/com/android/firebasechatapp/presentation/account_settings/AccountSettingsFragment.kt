@@ -40,8 +40,10 @@ class AccountSettingsFragment : Fragment() {
             btnSave.setOnClickListener {
                 it.hideKeyboard()
                 viewModel.onEvent(AccountSettingsEvent.SaveAction(
-                    email = binding.inputEmail.text.toString(),
-                    confirmedPassword = binding.inputPassword.text.toString()
+                    name = inputName.text.toString(),
+                    phone = inputPhone.text.toString(),
+                    email = inputEmail.text.toString(),
+                    confirmedPassword = inputPassword.text.toString()
                 ))
             }
 
@@ -63,7 +65,6 @@ class AccountSettingsFragment : Fragment() {
         }
         if (state.isProfileDataUpdated) {
             showToast("Profile data is updated successfully.")
-            goToLoginScreen()
         } else if (state.isPasswordResetEmailSent) {
             showToast("Password reset email is sent successfully.")
             goToLoginScreen()
