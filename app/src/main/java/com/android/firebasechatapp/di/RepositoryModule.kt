@@ -7,6 +7,7 @@ import com.android.firebasechatapp.domain.repository.authentication.AccountSetti
 import com.android.firebasechatapp.domain.repository.authentication.AuthenticationRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.storage.StorageReference
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -45,12 +46,14 @@ object RepositoryModule {
     fun provideAccountSettingRepository(
         firebaseAuth: FirebaseAuth,
         databaseReference: DatabaseReference,
+        storageReference: StorageReference,
         coroutineDispatcher: CoroutineDispatcher,
         @ApplicationContext context: Context
     ): AccountSettingRepository {
         return AccountSettingRepositoryImp(
             firebaseAuth = firebaseAuth,
             databaseReference = databaseReference,
+            storageReference = storageReference,
             coroutineDispatcher = coroutineDispatcher,
             context = context
         )

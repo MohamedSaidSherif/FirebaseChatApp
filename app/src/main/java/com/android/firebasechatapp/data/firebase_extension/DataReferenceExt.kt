@@ -1,7 +1,10 @@
 package com.android.firebasechatapp.data.firebase_extension
 
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
 import com.google.firebase.database.*
 import com.google.firebase.database.snapshot.Node
+import com.google.firebase.storage.UploadTask
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -169,3 +172,22 @@ suspend fun DatabaseReference.valueEventFlow(): Flow<ValueEventResponse> = callb
         removeEventListener(valueEventListener)
     }
 }
+
+
+/**
+ * Performs a [DatabaseReference.setValue] event call on databaseReference as suspending.
+ *
+ * @param onCancellation action to perform if there is a cancellation
+ */
+//suspend fun UploadTask.upload(
+//    value: Any?,
+//    priority: Node? = null,
+//    onCancellation: CancellationCallback = {}
+//): UploadTask<UploadTask.TaskSnapshot> =
+//    suspendCancellableCoroutine { continuation ->
+//    val completeListener = object : OnCompleteListener<UploadTask.TaskSnapshot> {
+//        override fun onComplete(p0: Task<UploadTask.TaskSnapshot>) {
+//
+//        }
+//    }
+//}

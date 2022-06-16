@@ -49,7 +49,7 @@ class HomeFragment : Fragment() {
                 true
             }
             R.id.optionAccountSettings -> {
-                findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToAccountSettingsFragment())
+                findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToAccountSettingsFragment(null))
                 return true
             }
             R.id.optionAdmin -> {

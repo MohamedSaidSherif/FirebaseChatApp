@@ -10,9 +10,7 @@ import com.android.firebasechatapp.resource.UiText
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,34 +21,27 @@ class AccountSettingsViewModel @Inject constructor(
     private val updateProfileDataUseCase: UpdateProfileDataUseCase
 ) : ViewModel() {
 
-    private val _accountSettingsState = MutableStateFlow(AccountSettingsState())
+    private val _accountSettingsState = MutableStateFlow<AccountSettingsState>(AccountSettingsState.InitialState)
     val accountSettingsState: StateFlow<AccountSettingsState> = _accountSettingsState.asStateFlow()
+
+    private val _progressVisibleState = MutableStateFlow(false)
+    val progressVisibleState: StateFlow<Boolean> = _progressVisibleState.asStateFlow()
+
+    private val _errorFlow = MutableSharedFlow<UiText>()
+    val errorFlow: SharedFlow<UiText> = _errorFlow.asSharedFlow()
+
 
     init {
         viewModelScope.launch {
-            _accountSettingsState.emit(
-                accountSettingsState.value.copy(
-                    isProgressBarVisible = true,
-                    errorUiText = null
-                )
-            )
+            _progressVisibleState.emit(true)
             when (val result = getUserUseCase()) {
                 is Resource.Success -> {
-                    _accountSettingsState.emit(
-                        accountSettingsState.value.copy(
-                            user = result.data,
-                            isProgressBarVisible = false,
-                            errorUiText = null
-                        )
-                    )
+                    _progressVisibleState.emit(false)
+                    _accountSettingsState.emit(AccountSettingsState.GetUser(result.data))
                 }
                 is Resource.Error -> {
-                    _accountSettingsState.emit(
-                        accountSettingsState.value.copy(
-                            isProgressBarVisible = false,
-                            errorUiText = result.uiText
-                        )
-                    )
+                    _progressVisibleState.emit(false)
+                    _errorFlow.emit(result.uiText)
                 }
             }
         }
@@ -70,45 +61,15 @@ class AccountSettingsViewModel @Inject constructor(
 
     private fun updateProfileData(event: AccountSettingsEvent.SaveAction) {
         viewModelScope.launch {
-            _accountSettingsState.emit(
-                accountSettingsState.value.copy(
-                    isProfileDataUpdated = false,
-                    isPasswordResetEmailSent = false,
-                    isProgressBarVisible = true,
-                    errorUiText = null
-                )
-            )
-            when (val result = updateProfileDataUseCase(
-                name = event.name,
-                phone = event.phone,
-                email = event.email,
-                password = event.confirmedPassword
-            )) {
+            _progressVisibleState.emit(true)
+            when (val result = updateProfileDataUseCase(event.profileData)) {
                 is Resource.Success -> {
-                    _accountSettingsState.emit(
-                        accountSettingsState.value.copy(
-                            isProfileDataUpdated = true,
-                            isEmailUpdated = result.data.isEmailUpdated,
-                            isPasswordResetEmailSent = false,
-                            isProgressBarVisible = false,
-                            errorUiText = null
-                        )
-                    )
+                    _progressVisibleState.emit(false)
+                    _accountSettingsState.emit(AccountSettingsState.ProfileUpdated(result.data.isEmailUpdated))
                 }
                 is Resource.Error -> {
-                    _accountSettingsState.emit(
-                        accountSettingsState.value.copy(
-                            user = accountSettingsState.value.user?.copy(
-                                name = event.name,
-                                phone = event.phone,
-                                email = event.email
-                            ),
-                            isProfileDataUpdated = false,
-                            isPasswordResetEmailSent = false,
-                            isProgressBarVisible = false,
-                            errorUiText = result.uiText
-                        )
-                    )
+                    _progressVisibleState.emit(false)
+                    _errorFlow.emit(result.uiText)
                 }
             }
         }
@@ -117,47 +78,21 @@ class AccountSettingsViewModel @Inject constructor(
     private fun sendPasswordResetEmail() {
         viewModelScope.launch {
             Firebase.auth.currentUser?.email?.let {
-                _accountSettingsState.emit(
-                    accountSettingsState.value.copy(
-                        isProfileDataUpdated = false,
-                        isPasswordResetEmailSent = false,
-                        isProgressBarVisible = true,
-                        errorUiText = null
-                    )
-                )
+                _progressVisibleState.emit(true)
                 when (val result = sendPasswordResetEmailUseCase(it)) {
                     is Resource.Success -> {
-                        _accountSettingsState.emit(
-                            accountSettingsState.value.copy(
-                                isProfileDataUpdated = false,
-                                isPasswordResetEmailSent = true,
-                                isProgressBarVisible = false,
-                                errorUiText = null
-                            )
-                        )
+                        _progressVisibleState.emit(false)
+                        _accountSettingsState.emit(AccountSettingsState.PasswordResetEmailSent)
                     }
                     is Resource.Error -> {
-                        _accountSettingsState.emit(
-                            accountSettingsState.value.copy(
-                                isProfileDataUpdated = false,
-                                isPasswordResetEmailSent = false,
-                                isProgressBarVisible = false,
-                                errorUiText = result.uiText
-                            )
-                        )
+                        _progressVisibleState.emit(false)
+                        _errorFlow.emit(result.uiText)
                     }
                 }
             } ?: kotlin.run {
                 //This case NEVER should happen
                 //and if it's happened, we should logout the user the redirect to login screen
-                _accountSettingsState.emit(
-                    accountSettingsState.value.copy(
-                        isProfileDataUpdated = false,
-                        isPasswordResetEmailSent = false,
-                        isProgressBarVisible = false,
-                        errorUiText = UiText.DynamicString("User Not Authenticated")
-                    )
-                )
+                _errorFlow.emit(UiText.DynamicString("User Not Authenticated"))
             }
         }
     }
