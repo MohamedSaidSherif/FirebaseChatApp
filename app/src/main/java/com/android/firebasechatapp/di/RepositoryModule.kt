@@ -3,8 +3,10 @@ package com.android.firebasechatapp.di
 import android.content.Context
 import com.android.firebasechatapp.data.repository.AccountSettingRepositoryImp
 import com.android.firebasechatapp.data.repository.AuthenticationRepositoryImp
+import com.android.firebasechatapp.data.repository.ChatRepositoryImp
 import com.android.firebasechatapp.domain.repository.authentication.AccountSettingRepository
 import com.android.firebasechatapp.domain.repository.authentication.AuthenticationRepository
+import com.android.firebasechatapp.domain.repository.authentication.ChatRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.storage.StorageReference
@@ -54,6 +56,22 @@ object RepositoryModule {
             firebaseAuth = firebaseAuth,
             databaseReference = databaseReference,
             storageReference = storageReference,
+            coroutineDispatcher = coroutineDispatcher,
+            context = context
+        )
+    }
+
+    @Singleton
+    @Provides
+    fun provideChatRepository(
+        firebaseAuth: FirebaseAuth,
+        databaseReference: DatabaseReference,
+        coroutineDispatcher: CoroutineDispatcher,
+        @ApplicationContext context: Context
+    ): ChatRepository {
+        return ChatRepositoryImp(
+            firebaseAuth = firebaseAuth,
+            databaseReference = databaseReference,
             coroutineDispatcher = coroutineDispatcher,
             context = context
         )

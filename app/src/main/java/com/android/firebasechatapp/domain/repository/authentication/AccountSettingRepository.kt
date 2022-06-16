@@ -8,4 +8,5 @@ import com.android.firebasechatapp.resource.Resource
 interface AccountSettingRepository {
     suspend fun getUser(): Resource<User>
     suspend fun updateProfileData(profileData: ProfileData): Resource<ProfileUpdateResult>
+    suspend fun getSecurityLevel(): Resource<Int>
 }

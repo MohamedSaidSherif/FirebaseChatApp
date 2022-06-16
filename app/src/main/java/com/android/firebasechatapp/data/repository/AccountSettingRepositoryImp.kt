@@ -47,16 +47,25 @@ class AccountSettingRepositoryImp @Inject constructor(
                     firebaseUser.email?.let { email ->
                         val result =
                             databaseReference.child(context.getString(R.string.dbnode_users))
-                                .orderByKey()
+                                .orderByKey() //OR could use ->.orderByChild(getString(R.string.field_user_id))
                                 .equalTo(firebaseUser.uid)
                                 .singleValueEvent()
                         when (result) {
                             is DataResponse.Complete -> {
-                                result.data.children.forEach {
-                                    val remoteUser = it.getValue(RemoteUser::class.java)
-                                    remoteUser?.let { remoteUser ->
-                                        return@safeCall Resource.Success(remoteUser.toUser(email))
-                                    }
+//                                result.data.children.forEach {
+//                                    val remoteUser = it.getValue(RemoteUser::class.java)
+//                                    remoteUser?.let { NonNullableRemoteUser ->
+//                                        return@safeCall Resource.Success(NonNullableRemoteUser.toUser(email))
+//                                    }
+//                                }
+                                val remoteUser = result.data.children.iterator().next()
+                                    .getValue(RemoteUser::class.java)
+                                remoteUser?.let { NonNullableRemoteUser ->
+                                    return@safeCall Resource.Success(
+                                        NonNullableRemoteUser.toUser(
+                                            email
+                                        )
+                                    )
                                 }
                                 Resource.Error(
                                     uiText = UiText.DynamicString("Failed to get user info")
@@ -129,6 +138,22 @@ class AccountSettingRepositoryImp @Inject constructor(
                     //and if it's happened, we should logout the user the redirect to login screen
                     Resource.Error(uiText = UiText.DynamicString("User Not Authenticated. Failed to get current user"))
                 }
+            }
+        }
+    }
+
+    override suspend fun getSecurityLevel(): Resource<Int> {
+        return when (val result = getUser()) {
+            is Resource.Success -> {
+                Resource.Success(Integer.parseInt(result.data.securityLevel))
+            }
+            else -> {
+                val uiText = if (result is Resource.Error) {
+                    result.uiText
+                } else {
+                    UiText.unknownError()
+                }
+                Resource.Error(uiText)
             }
         }
     }

@@ -46,6 +46,7 @@ class HomeFragment : Fragment() {
                 true
             }
             R.id.optionChat -> {
+                findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToChatFragment())
                 true
             }
             R.id.optionAccountSettings -> {
