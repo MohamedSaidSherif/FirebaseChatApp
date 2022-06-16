@@ -1,4 +1,4 @@
-package com.android.firebasechatapp.data.repository
+package com.android.firebasechatapp.data.repository.authentication
 
 import android.content.Context
 import com.android.firebasechatapp.R

@@ -1,6 +1,6 @@
 package com.android.firebasechatapp.domain.use_case.chat
 
-import com.android.firebasechatapp.domain.repository.authentication.ChatRepository
+import com.android.firebasechatapp.domain.repository.chat.ChatRepository
 import com.android.firebasechatapp.resource.Resource
 import com.android.firebasechatapp.resource.SimpleResource
 import javax.inject.Inject

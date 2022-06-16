@@ -1,12 +1,12 @@
 package com.android.firebasechatapp.di
 
 import android.content.Context
-import com.android.firebasechatapp.data.repository.AccountSettingRepositoryImp
-import com.android.firebasechatapp.data.repository.AuthenticationRepositoryImp
-import com.android.firebasechatapp.data.repository.ChatRepositoryImp
+import com.android.firebasechatapp.data.repository.authentication.AccountSettingRepositoryImp
+import com.android.firebasechatapp.data.repository.authentication.AuthenticationRepositoryImp
+import com.android.firebasechatapp.data.repository.chat.ChatRepositoryImp
 import com.android.firebasechatapp.domain.repository.authentication.AccountSettingRepository
 import com.android.firebasechatapp.domain.repository.authentication.AuthenticationRepository
-import com.android.firebasechatapp.domain.repository.authentication.ChatRepository
+import com.android.firebasechatapp.domain.repository.chat.ChatRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.storage.StorageReference

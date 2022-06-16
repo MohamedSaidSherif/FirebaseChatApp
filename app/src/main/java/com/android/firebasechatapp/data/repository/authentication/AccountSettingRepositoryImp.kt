@@ -1,4 +1,4 @@
-package com.android.firebasechatapp.data.repository
+package com.android.firebasechatapp.data.repository.authentication
 
 import android.content.Context
 import android.net.Uri
@@ -41,6 +41,16 @@ class AccountSettingRepositoryImp @Inject constructor(
 ) : AccountSettingRepository {
 
     override suspend fun getUser(): Resource<User> {
+        return firebaseAuth.currentUser?.let { firebaseUser ->
+            getUserById(firebaseUser.uid)
+        } ?: kotlin.run {
+            //This case NEVER should happen
+            //and if it's happened, we should logout the user the redirect to login screen
+            Resource.Error(uiText = UiText.DynamicString("User Not Authenticated. Failed to get current user"))
+        }
+    }
+
+    override suspend fun getUserById(userId: String): Resource<User> {
         return withContext(coroutineDispatcher) {
             safeCall {
                 firebaseAuth.currentUser?.let { firebaseUser ->
@@ -48,7 +58,7 @@ class AccountSettingRepositoryImp @Inject constructor(
                         val result =
                             databaseReference.child(context.getString(R.string.dbnode_users))
                                 .orderByKey() //OR could use ->.orderByChild(getString(R.string.field_user_id))
-                                .equalTo(firebaseUser.uid)
+                                .equalTo(userId)
                                 .singleValueEvent()
                         when (result) {
                             is DataResponse.Complete -> {
